@@ -1,23 +1,19 @@
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
 from jose import jwt
-import os
+from datetime import datetime, timedelta
+
+SECRET_KEY = "supersecretkey"
+ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def hash_password(password: str):
+def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
-def verify_password(password: str, hashed: str):
+def verify_password(password: str, hashed: str) -> bool:
     return pwd_context.verify(password, hashed)
 
-
-
-SECRET_KEY = os.getenv("JWT_SECRET")
-ALGORITHM = "HS256"
-
-def create_access_token(data: dict, expires_minutes: int = 60):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+def create_access_token(data: dict):
+    payload = data.copy()
+    payload["exp"] = datetime.utcnow() + timedelta(hours=1)
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

@@ -1,16 +1,13 @@
 import time
 from sqlalchemy.exc import OperationalError
+from app.core.database import engine
+from app.models.base import Base
 
-from app.core.database import engine, Base
-
-def init_db(retries: int = 10, delay: int = 2):
-    for attempt in range(retries):
+def init_db():
+    for _ in range(10):  # retry loop (CRITICAL)
         try:
             Base.metadata.create_all(bind=engine)
-            print("✅ Database connected and tables created")
             return
         except OperationalError:
-            print(f"⏳ Database not ready, retrying ({attempt+1}/{retries})...")
-            time.sleep(delay)
-
-    raise Exception("❌ Database not available after retries")
+            time.sleep(2)
+    raise RuntimeError("Database not ready")
