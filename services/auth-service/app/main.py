@@ -1,14 +1,18 @@
 from fastapi import FastAPI
-from app.api.auth import router as auth_router
+from app.api import auth, internal
 from app.core.init_db import init_db
 
-app = FastAPI(title="Auth Service", version="0.1.0")
+app = FastAPI(title="Auth Service")
+
 
 @app.on_event("startup")
 def startup():
     init_db()
 
-app.include_router(auth_router)
+
+app.include_router(auth.router)
+app.include_router(internal.router)
+
 
 @app.get("/health")
 def health():
